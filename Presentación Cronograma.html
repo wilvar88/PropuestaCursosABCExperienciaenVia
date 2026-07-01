@@ -934,6 +934,23 @@ show();
 });
 
 
+/* Navegación con el scroll del mouse */
+let wheelCooldown = false;
+document.addEventListener("wheel", e => {
+    if (wheelCooldown) return;
+    wheelCooldown = true;
+    setTimeout(() => { wheelCooldown = false; }, 700);
+
+    if (e.deltaY > 0 && current < slides.length - 1) {
+        current++;
+        show();
+    } else if (e.deltaY < 0 && current > 0) {
+        current--;
+        show();
+    }
+}, { passive: true });
+
+
 show();
 
 
