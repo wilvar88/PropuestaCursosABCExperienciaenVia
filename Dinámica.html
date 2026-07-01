@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototipo: Constructor del Ikigai (Con Validación)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        :root {
+            --primary: #00E470;
+            --secondary: #CDD400;
+            --error: #FF5A5F;
+            --bg-color: #fafafa;
+            --text-dark: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .header h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Contenedor del Diagrama Ikigai */
+        .ikigai-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 30px auto;
+        }
+
+        /* Círculos del diagrama */
+        .circle {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            opacity: 0.2;
+            border: 2px solid transparent;
+        }
+
+        .c-pasion { top: 0; left: 60px; background-color: var(--error); border-color: var(--error); }
+        .c-profesion { bottom: 20px; left: 0; background-color: #087E8B; border-color: #087E8B; }
+        .c-vocacion { bottom: 20px; right: 0; background-color: var(--secondary); border-color: var(--secondary); }
+        .c-mision { top: 60px; left: 60px; width: 180px; height: 180px; background-color: var(--primary); border-color: var(--primary); }
+
+        /* Zona central donde caen las frases */
+        .center-zone {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.5s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Efecto de brillo cuando se completa el reto */
+        .glow-effect {
+            box-shadow: 0 0 30px var(--primary), inset 0 0 15px var(--primary);
+            background: rgba(0, 228, 112, 0.1);
+            border: 2px solid var(--primary);
+        }
+
+        /* Contenedor de las frases para seleccionar */
+        .phrases-container {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            padding: 15px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+        }
+
+        /* Estilo de las píldoras (frases) */
+        .phrase {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #444;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            user-select: none;
+        }
+
+        .phrase:active {
+            transform: scale(0.95);
+        }
+
+        /* Animación y estilo para opción INCORRECTA */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-2deg); }
+            50% { transform: translateX(5px) rotate(2deg); }
+            75% { transform: translateX(-5px) rotate(-2deg); }
+            100% { transform: translateX(0); }
+        }
+
+        .error-shake {
+            animation: shake 0.4s ease;
+            background-color: #ffeaea !important;
+            border-color: var(--error) !important;
+            color: #d32f2f !important;
+        }
+
+        /* Estado cuando la frase ya está en el centro (CORRECTA) */
+        .phrase.in-center {
+            font-size: 0.65rem;
+            padding: 5px 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: popIn 0.3s ease forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Mensaje de error flotante (Toast) */
+        .toast-error {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--error);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(255, 90, 95, 0.4);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast-error.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Modal de éxito */
+        .success-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .success-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .success-modal h3 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .success-modal p {
+            color: #666;
+            text-align: center;
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .btn-continuar {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 228, 112, 0.4);
+            transition: transform 0.2s;
+        }
+        
+        .btn-continuar:active {
+            transform: scale(0.95);
+        }
+
+        /* Botón Home */
+        #btn-home {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            background: #001E47;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 16px rgba(0,30,71,0.3);
+            text-decoration: none;
+            z-index: 1000;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        #btn-home:hover {
+            background: #002f6c;
+            transform: translateY(-2px);
+        }
+        #btn-home svg {
+            width: 15px;
+            height: 15px;
+            fill: #CDD400;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>Dinámica: Tu Ikigai</h2>
+        <p>Toca 3 acciones que construyan una experiencia positiva y llévalas a tu centro.</p>
+    </div>
+
+    <!-- Diagrama -->
+    <div class="ikigai-container">
+        <div class="circle c-pasion"></div>
+        <div class="circle c-profesion"></div>
+        <div class="circle c-vocacion"></div>
+        <div class="circle c-mision"></div>
+        
+        <!-- Zona de aterrizaje -->
+        <div class="center-zone" id="centerZone">
+            <!-- Las frases se moverán aquí por JS -->
+        </div>
+    </div>
+
+    <!-- Opciones (Carrusel inferior con opciones Válidas e Inválidas) -->
+    <div class="phrases-container" id="phrasesContainer">
+        <!-- Opciones CORRECTAS -->
+        <div class="phrase" data-valid="true" onclick="checkAnswer(this)">Organizar la fila con eficiencia</div>
+        <div class="phrase" data-valid="false" onclick="checkAnswer(this)">Ignorar el radio para evitar el estrés</div>
+        <div class="phrase" data-valid="true" onclick="checkAnswer(this)">Ayudar a un usuario desorientado</div>
+        <div class="phrase" data-valid="false" onclick="checkAnswer(this)">Salir corriendo porque lo importante es correr</div>
+        <div class="phrase" data-valid="true" onclick="checkAnswer(this)">Reportar ágilmente al CCI</div>
+        <div class="phrase" data-valid="true" onclick="checkAnswer(this)">Saludar con una sonrisa</div>
+        
+        <!-- Opciones INCORRECTAS (Absurdas / Anti-servicio) -->
+        <div class="phrase" data-valid="false" onclick="checkAnswer(this)">Gritarle al usuario porque yo tengo la razón</div>
+    </div>
+
+    <!-- Mensaje Toast para error -->
+    <div class="toast-error" id="toastError">
+        ¡Auch! Esa acción no construye una buena experiencia.
+    </div>
+
+    <!-- Modal de Éxito -->
+    <div class="success-modal" id="successModal">
+        <h3>¡Propósito Encontrado!</h3>
+        <p>Tus elecciones han sido guardadas. Estas acciones son el motor que mueve a Bogotá gracias a ti.</p>
+        <button class="btn-continuar" onclick="cerrarPrototipo()">Siguiente Capítulo</button>
+    </div>
+
+    <!-- Botón Home -->
+    <a id="btn-home" href="index.html#slide2">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        Volver al Menú
+    </a>
+
+    <script>
+        let selectedCount = 0;
+        const requiredSelections = 3;
+        let toastTimeout;
+
+        function checkAnswer(element) {
+            // Si ya seleccionamos 3, no dejamos agregar más
+            if (selectedCount >= requiredSelections) return;
+
+            // Verificamos si la opción es correcta leyendo el atributo data-valid
+            const isValid = element.getAttribute('data-valid') === 'true';
+
+            if (isValid) {
+                // LÓGICA PARA OPCIÓN CORRECTA
+                const centerZone = document.getElementById('centerZone');
+                
+                // Movemos el elemento al centro
+                centerZone.appendChild(element);
+                
+                // Le añadimos la clase para que cambie su diseño
+                element.classList.add('in-center');
+                
+                // Quitamos el evento onclick
+                element.onclick = null;
+                selectedCount++;
+
+                // Verificamos si ya completó el reto
+                if (selectedCount === requiredSelections) {
+                    triggerSuccess();
+                }
+            } else {
+                // LÓGICA PARA OPCIÓN INCORRECTA
+                
+                // Añadimos la clase de animación de temblor y color rojo
+                element.classList.add('error-shake');
+                
+                // Mostramos el mensaje de error
+                showErrorToast();
+                
+                // Removemos la clase de animación después de 400ms para que pueda volver a reproducirse si lo vuelve a tocar
+                setTimeout(() => {
+                    element.classList.remove('error-shake');
+                }, 400);
+            }
+        }
+
+        function showErrorToast() {
+            const toast = document.getElementById('toastError');
+            toast.classList.add('show');
+            
+            // Reiniciamos el temporizador por si toca varias veces seguidas
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500); // El mensaje desaparece a los 2.5 segundos
+        }
+
+        function triggerSuccess() {
+            const centerZone = document.getElementById('centerZone');
+            const modal = document.getElementById('successModal');
+            
+            // Añadir brillo al centro
+            centerZone.classList.add('glow-effect');
+
+            // Simular el tiempo de envío a Apps Script
+            setTimeout(() => {
+                console.log("Guardando datos en Google Sheets...");
+                modal.classList.add('show');
+            }, 1000); 
+        }
+
+        function cerrarPrototipo() {
+            alert("Aquí el usuario sería redirigido al siguiente módulo.");
+        }
+    </script>
+</body>
+</html>

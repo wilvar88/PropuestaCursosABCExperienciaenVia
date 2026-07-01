@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso ABC Experiencia en Vía - Contenido</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #001E47;
+            --secondary: #CDD400;
+            --text-dark: #1F2937;
+            --text-light: #4B5563;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #f0f4f8;
+        }
+
+        /* ── Ambient blobs ── */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        .blob-1 { width: 500px; height: 500px; background: var(--primary);   top: -150px; left: -150px; }
+        .blob-2 { width: 400px; height: 400px; background: var(--secondary); bottom: -100px; right: -100px; }
+        .blob-3 { width: 600px; height: 600px; background: rgba(0,228,112,.15); top: 40%; left: 50%; transform: translate(-50%,-50%); }
+
+        /* ── Slider wrapper ── */
+        #slider-wrapper {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            /* Horizontal slide animation */
+            transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ── Individual slide ── */
+        .slide {
+            flex: 0 0 100vw;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        /* ── Inner content box ── */
+        .slide-inner {
+            width: 100%;
+            max-width: 980px;
+        }
+
+        /* ── Cover slide ── */
+        .cover-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary), #9eb300);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .cover-desc {
+            font-size: 1.05rem;
+            color: var(--text-light);
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(12px);
+            padding: 2rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.9);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+            line-height: 1.7;
+        }
+
+        /* ── Chapter card ── */
+        .card {
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.9);
+            border-left: 5px solid var(--primary);
+            padding: 2.2rem 2.8rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        }
+
+        .card.alt {
+            border-left-color: var(--secondary);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chapter-num {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .alt .chapter-num {
+            background: var(--secondary);
+            color: #333;
+        }
+
+        .card h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.55rem;
+            color: var(--text-dark);
+        }
+
+        /* ── Sections grid ── */
+        .sections-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .content-section {
+            background: rgba(255,255,255,0.6);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .content-section h3 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .alt .content-section h3 {
+            color: #7a8c00;
+        }
+
+        .content-section p {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            line-height: 1.55;
+        }
+
+        /* ── Gamification box ── */
+        .gamification-box {
+            background: rgba(205, 212, 0, 0.1);
+            border: 1px solid rgba(205, 212, 0, 0.35);
+            border-radius: 14px;
+            padding: 1rem 1.3rem;
+        }
+
+        .gamification-box h4 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #7a8c00;
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .gamification-box p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* ── Counter & hint ── */
+        #slide-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 28px;
+            background: rgba(0,30,71,0.88);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 999;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Home button ── */
+        #btn-home {
+            position: fixed;
+            bottom: 22px;
+            left: 28px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 16px rgba(0,30,71,0.25);
+            text-decoration: none;
+            z-index: 1000;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        #btn-home:hover {
+            background: #002f6c;
+            transform: translateY(-2px);
+        }
+        #btn-home svg {
+            width: 15px;
+            height: 15px;
+            fill: #CDD400;
+        }
+
+        /* ── Dot navigation ── */
+        #dots {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 999;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(0,30,71,0.25);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--primary);
+            width: 24px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <!-- ═══════════════ SLIDER ═══════════════ -->
+    <div id="slider-wrapper">
+
+        <!-- SLIDE 0: Portada -->
+        <div class="slide">
+            <div class="slide-inner">
+                <h1 class="cover-title">Curso: ABC<br>Experiencia en Vía</h1>
+                <p class="cover-desc">
+                    Esta presentación constituye la propuesta base y la estructura metodológica del programa <strong>'ABC Experiencia en Vía'</strong>. El contenido expuesto tiene como propósito fundamental validar el flujo de navegación, la organización temática y la dinámica pedagógica del curso. Esta versión preliminar es un modelo conceptual; el desarrollo final será significativamente más extenso y profundo, garantizando una experiencia de aprendizaje de alto impacto para todos los colaboradores.
+                </p>
+            </div>
+        </div>
+
+        <!-- SLIDE 1: Capítulo 1 -->
+        <div class="slide">
+            <div class="slide-inner">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="chapter-num">1</div>
+                        <h2>Nuestro ADN y Propósito</h2>
+                    </div>
+                    <div class="sections-grid">
+                        <div class="content-section">
+                            <h3>📋 Contenido Base</h3>
+                            <p>Propósito, ambición, valores corporativos (honestidad, respeto, compromiso, diligencia, justicia, empatía) y el concepto del Ikigai (Pasión, Profesión, Misión, Vocación).</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>💬 Desarrollo Cálido</h3>
+                            <p>Antes de ponernos el uniforme, es vital entender por qué hacemos lo que hacemos. Somos el puente que permite a millones de ciudadanos cumplir sus sueños. Encontrar nuestro propósito transforma un trabajo rutinario en una verdadera vocación.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🎯 Ejemplo Práctico</h3>
+                            <p>Es un martes lluvioso a las 5:00 a.m. Tu empatía y diligencia ayudan a una enfermera a llegar a tiempo a su turno, cambiando por completo su día.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🤔 Reflexión</h3>
+                            <p>¿De qué manera tu trabajo diario se conecta con lo que amas y lo que la ciudad necesita?</p>
+                        </div>
+                    </div>
+                    <div class="gamification-box">
+                        <h4>🎮 Dinámica: El Constructor del Ikigai</h4>
+                        <p>Aparecen los cuatro círculos del Ikigai y un carrusel de frases. El colaborador arrastra 3 frases al centro. Al soltarlas, el centro brilla confirmando el registro.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: Capítulo 2 -->
+        <div class="slide">
+            <div class="slide-inner">
+                <div class="card alt">
+                    <div class="card-header">
+                        <div class="chapter-num">2</div>
+                        <h2>La Ciencia y el Arte de Conectar</h2>
+                    </div>
+                    <div class="sections-grid">
+                        <div class="content-section">
+                            <h3>📋 Contenido Base</h3>
+                            <p>Beneficios fisiológicos de la risa. Componentes del ser (Comportamientos, Creencias, Emociones). Paso del Sistema 1 (reacción) al Sistema 2 (análisis).</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>💬 Desarrollo Cálido</h3>
+                            <p>Nuestra mente y cuerpo son nuestras mejores herramientas. Reír oxigena y fortalece. Pasar de reaccionar impulsivamente al análisis con calma es un superpoder para cuidar de nosotros y de nuestros usuarios.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🎯 Ejemplo Práctico</h3>
+                            <p>Un usuario reclama por un retraso. Sistema 1: "Me ataca a mí" (enojo). Sistema 2: "Está frustrado por el afán, no es contra mí". Una sonrisa genuina baja la tensión.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🤔 Reflexión</h3>
+                            <p>¿Qué "certezas" o creencias limitantes sobre los usuarios podrían estar afectando tu actitud diaria?</p>
+                        </div>
+                    </div>
+                    <div class="gamification-box">
+                        <h4>🎮 Dinámica: Tarjetas de Decisión (Tinder-style)</h4>
+                        <p>Aparece una situación de estrés. El colaborador desliza la tarjeta a la izquierda (Sistema 1) o derecha (Sistema 2). Recibe retroalimentación visual inmediata.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: Capítulo 3 -->
+        <div class="slide">
+            <div class="slide-inner">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="chapter-num">3</div>
+                        <h2>Más que un Servicio, Una Experiencia</h2>
+                    </div>
+                    <div class="sections-grid">
+                        <div class="content-section">
+                            <h3>📋 Contenido Base</h3>
+                            <p>Diferencia entre Servicio (Lo que hago) y Experiencia (Cómo hago sentir). Las 4E's: Expectativa de solución, Empatía, Experiencia, Explicación.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>💬 Desarrollo Cálido</h3>
+                            <p>El servicio básico es llevar un bus del punto A al B. La experiencia es la magia en medio: los buenos días, la claridad, la seguridad. Dominando las 4E's nos convertimos en guardianes de 4 millones de personas.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🎯 Ejemplo Práctico</h3>
+                            <p>Servicio: "Tome el F23" sin mirar. Experiencia: notar la confusión, sonreír y decir: "Buenos días, para su destino tome el F23 en la puerta 2. Pasa en 5 minutos".</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🤔 Reflexión</h3>
+                            <p>Al final de tu turno, ¿qué tipo de emociones estás dejando en las personas que interactuaron contigo?</p>
+                        </div>
+                    </div>
+                    <div class="gamification-box">
+                        <h4>🎮 Dinámica: El Rompecabezas de las 4E's</h4>
+                        <p>Una silueta de un camino. El usuario arrastra 4 bloques de cristal (Las 4E's) y los ordena. Al completarlo, una animación muestra a un usuario cruzando feliz el puente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: Capítulo 4 -->
+        <div class="slide">
+            <div class="slide-inner">
+                <div class="card alt">
+                    <div class="card-header">
+                        <div class="chapter-num">4</div>
+                        <h2>El ABC de la Experiencia en Vía</h2>
+                    </div>
+                    <div class="sections-grid">
+                        <div class="content-section">
+                            <h3>📋 Contenido Base</h3>
+                            <p>El Modelo ABC (Ayudo, Busco, Construyo). 18 Herramientas de acción en vía (contacto visual, postura, desescalar, etc.).</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>💬 Desarrollo Cálido</h3>
+                            <p>Esta es tu caja de herramientas diaria. "Ayudar, Buscar y Construir" se logra con pequeños detalles. Soltar el celular y tener un lenguaje corporal abierto hace tu jornada mucho más fluida.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🎯 Ejemplo Práctico</h3>
+                            <p>En lugar de gritar a alguien que evade el pago, te acercas relajado: "Buenos días, el ingreso es validando el pasaje, ¿le ayudo a ubicar la taquilla?" (Explicar antes de corregir).</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🤔 Reflexión</h3>
+                            <p>De las 18 herramientas, ¿cuál es tu mayor fortaleza y cuál necesitas practicar más?</p>
+                        </div>
+                    </div>
+                    <div class="gamification-box">
+                        <h4>🎮 Dinámica: La Caja de Herramientas Virtual</h4>
+                        <p>Un escenario específico en pantalla. Abajo hay iconos flotantes de las 18 herramientas. El colaborador arrastra a la caja las 3 herramientas clave para resolver la situación.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: Capítulo 5 -->
+        <div class="slide">
+            <div class="slide-inner">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="chapter-num">5</div>
+                        <h2>Contingencias y Seguridad (CCI)</h2>
+                    </div>
+                    <div class="sections-grid">
+                        <div class="content-section">
+                            <h3>📋 Contenido Base</h3>
+                            <p>Modelo ABC del CCI: Advertir, Brindar información (las 5 preguntas), Comunicar (canales adecuados).</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>💬 Desarrollo Cálido</h3>
+                            <p>Eres los ojos y oídos del Centro de Control. Actuar rápido minimiza el caos. No necesitas resolver la emergencia solo; necesitas comunicarla con precisión para garantizar apoyo rápido.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🎯 Ejemplo Práctico</h3>
+                            <p>En lugar de "¡Hubo un choque!", reportas: "Accidente en Estación Calle 100, sentido N-S. Hay un herido leve y el carril está bloqueado". Esa precisión salva minutos críticos.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🤔 Reflexión</h3>
+                            <p>¿Qué técnica puedes usar para mantener la calma y responder mentalmente las 5 preguntas antes de usar el radio?</p>
+                        </div>
+                    </div>
+                    <div class="gamification-box">
+                        <h4>🎮 Dinámica: El Simulador de Radio</h4>
+                        <p>Interfaz de un radio moderno. Ante una alerta en pantalla, el colaborador presiona en orden 5 botones iluminados (Qué, Dónde, Heridos, Paso, Tiempo) antes de "Transmitir".</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: Capítulo 6 -->
+        <div class="slide">
+            <div class="slide-inner">
+                <div class="card alt">
+                    <div class="card-header">
+                        <div class="chapter-num">6</div>
+                        <h2>Tu Mentalidad y Crecimiento</h2>
+                    </div>
+                    <div class="sections-grid">
+                        <div class="content-section">
+                            <h3>📋 Contenido Base</h3>
+                            <p>Los 4 Acuerdos (Honra tus palabras, No tomes nada personal, No asumas, Da lo mejor de ti). Fórmula del éxito (80% Actitud). Experiencia WOW vs Auch.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>💬 Desarrollo Cálido</h3>
+                            <p>Trabajar en la vía exige una coraza emocional y un corazón compasivo. Los 4 Acuerdos son tu escudo para no llevarte el estrés a casa. El 80% depende de tu actitud.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🎯 Ejemplo Práctico</h3>
+                            <p>Un usuario reclama por lluvia. Si asumes que es contra ti, te enojas. Si sabes que "no es personal" (está mojado y cansado), lo escuchas con calma protegiendo tu propia energía.</p>
+                        </div>
+                        <div class="content-section">
+                            <h3>🤔 Reflexión</h3>
+                            <p>De los 4 Acuerdos, ¿cuál te cuesta más aplicar bajo presión?</p>
+                        </div>
+                    </div>
+                    <div class="gamification-box">
+                        <h4>🎮 Dinámica: El Escudo de Acuerdos</h4>
+                        <p>El colaborador arrastra su emoción actual y su acuerdo de la semana a un "escudo" central. El sistema emite una Tarjeta de Compromiso digital personalizada.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /slider-wrapper -->
+
+    <!-- UI: counter, hint, dots -->
+    <div id="slide-counter">1 / 7</div>
+    <div id="nav-hint">← → Teclado &nbsp;|&nbsp; 🖱️ Scroll</div>
+    <div id="dots"></div>
+
+    <!-- Botón Home -->
+    <a id="btn-home" href="index.html#slide2">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        Volver al Menú
+    </a>
+
+    <script>
+        const wrapper   = document.getElementById('slider-wrapper');
+        const slides    = document.querySelectorAll('.slide');
+        const counter   = document.getElementById('slide-counter');
+        const dotsEl    = document.getElementById('dots');
+        const total     = slides.length;
+        let current     = 0;
+        let locked      = false;  // Prevent rapid-fire navigation
+
+        /* ── Build dots ── */
+        slides.forEach((_, i) => {
+            const d = document.createElement('div');
+            d.className = 'dot' + (i === 0 ? ' active' : '');
+            d.addEventListener('click', () => goTo(i));
+            dotsEl.appendChild(d);
+        });
+
+        function updateUI() {
+            wrapper.style.transform = `translateX(-${current * 100}vw)`;
+            counter.textContent = (current + 1) + ' / ' + total;
+            document.querySelectorAll('.dot').forEach((d, i) => {
+                d.classList.toggle('active', i === current);
+            });
+            // Unlock after transition ends
+            setTimeout(() => { locked = false; }, 560);
+        }
+
+        function goTo(index) {
+            if (locked) return;
+            if (index < 0 || index >= total) return;
+            locked = true;
+            current = index;
+            updateUI();
+        }
+
+        /* ── Keyboard: ArrowLeft / ArrowRight ── */
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') goTo(current + 1);
+            if (e.key === 'ArrowLeft')  goTo(current - 1);
+        });
+
+        /* ── Mouse wheel: one slide per scroll event ── */
+        let wheelCooldown = false;
+        document.addEventListener('wheel', e => {
+            if (wheelCooldown) return;
+            wheelCooldown = true;
+            setTimeout(() => { wheelCooldown = false; }, 700);
+
+            if (e.deltaY > 0) goTo(current + 1);   // scroll down → next
+            if (e.deltaY < 0) goTo(current - 1);   // scroll up  → prev
+        }, { passive: true });
+
+        /* ── Init ── */
+        updateUI();
+    </script>
+
+</body>
+</html>

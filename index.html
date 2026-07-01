@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABC Experiencia en Vía</title>
+
+    <!-- Fuentes modernas: Outfit para títulos y Inter para cuerpos de texto -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Iconografía Clean UI usando FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Colores corporativos requeridos */
+            --primary: #001e47;
+            /* Azul oscuro */
+            --secondary: #CDD400;
+            /* Verde/Amarillo lima */
+
+            --text-dark: #1f2937;
+            --text-light: #4b5563;
+            --bg-base: #ffffff;
+        }
+
+        html {
+            font-size: 14.5px; /* Reduce todo el tamaño basado en rem ~10% */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-dark);
+            position: relative;
+        }
+
+        /* 
+         * Fondo Dinámico con blobs desenfocados para 
+         * realzar el efecto Glassmorphism 
+         */
+        .blob {
+            position: absolute;
+            filter: blur(90px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 12s infinite ease-in-out alternate;
+            border-radius: 50%;
+        }
+
+        .blob-1 {
+            top: -15%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: rgba(0, 30, 71, 0.2);
+            /* Azul - Var --primary */
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            bottom: -20%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: rgba(205, 212, 0, 0.35);
+            /* Verde - Var --secondary */
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(3%, 5%) scale(1.05);
+            }
+
+            100% {
+                transform: translate(-2%, 8%) scale(1.1);
+            }
+        }
+
+        /* Contenedor del Slide/Carrusel */
+        .slider-container {
+            position: relative;
+            width: 95%;
+            max-width: 1300px;
+            height: auto;
+            min-height: 70vh;
+            perspective: 1000px;
+        }
+
+        /* Configuración base de diapositivas */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(30px) scale(0.95);
+            transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            z-index: 10;
+        }
+
+        /* Tarjeta Glassmorphism (Vidrio esmerilado) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            padding: 3.5rem;
+            box-shadow: 0 15px 35px 0 rgba(0, 30, 71, 0.08);
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Scrollbar estilizada */
+        .glass-card::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .glass-card::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .glass-card::-webkit-scrollbar-thumb {
+            background: rgba(0, 30, 71, 0.15);
+            border-radius: 10px;
+        }
+
+        .glass-card::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 30, 71, 0.3);
+        }
+
+        /* Accent Borders (Bordes corporativos superiores) */
+        .accent-primary {
+            border-top: 6px solid var(--primary);
+        }
+
+        .accent-secondary {
+            border-top: 6px solid var(--secondary);
+        }
+
+        /* Título Principal (Intro) */
+        .main-title {
+            text-align: center;
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.5px;
+        }
+
+        .main-title .dark-text {
+            color: var(--primary);
+        }
+
+        .main-title .green-text {
+            color: #8A9A00;
+            /* Verde oliva/lima adaptado */
+        }
+
+        /* Tarjeta Intro (Estilo Imagen) */
+        .intro-card {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(138, 154, 0, 0.25);
+            /* Borde verde sutil */
+            border-radius: 16px;
+            padding: 2.5rem 3.5rem;
+            box-shadow: 0 10px 40px rgba(0, 30, 71, 0.05);
+            text-align: center;
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .intro-text strong {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        /* Tipografías */
+        h1,
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            line-height: 1.25;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        p strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .highlight-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-align: center;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(205, 212, 0, 0.15), rgba(205, 212, 0, 0.05));
+            border-radius: 12px;
+            border: 1px solid rgba(205, 212, 0, 0.3);
+        }
+
+        /* Iconografía Clean UI */
+        .card-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 8px 16px rgba(0, 30, 71, 0.06);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .icon-primary {
+            color: var(--primary);
+        }
+
+        .icon-secondary {
+            color: var(--secondary);
+        }
+
+        /* Tarjetas de características inmersivas (Slide 2) */
+        .slide-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 0 1rem 0;
+            text-align: left;
+            letter-spacing: -0.5px;
+        }
+
+        .feature-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .f-card {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 1.2rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 30, 71, 0.03);
+            border: 1px solid rgba(255,255,255,0.8);
+            gap: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .f-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 25px rgba(0, 30, 71, 0.06);
+            background: #ffffff;
+        }
+
+        .f-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .f-icon-1 { background: var(--primary); color: #ffffff; }
+        .f-icon-2 { background: var(--secondary); color: var(--primary); }
+        .f-icon-3 { background: var(--primary); color: #ffffff; }
+        .f-icon-4 { background: linear-gradient(135deg, var(--secondary), #a0b000); color: var(--primary); }
+
+        .f-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: left;
+        }
+
+        .f-content h3 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .f-content p {
+            font-size: 1.05rem;
+            color: var(--text-light);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Botones Interactivos */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        button,
+        .btn-link {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 500;
+            padding: 0.9rem 1.8rem;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        /* Botón Primario (Navegación) */
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 6px 20px rgba(0, 30, 71, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: #001330;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 30, 71, 0.35);
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: var(--primary);
+            border: 1px solid rgba(0, 30, 71, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        /* Botones para vínculos (Glassmorphism sutil) */
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-glass:hover {
+            background: #ffffff;
+            border-color: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(205, 212, 0, 0.15);
+        }
+
+        .btn-glass i {
+            color: var(--primary);
+            opacity: 0.7;
+            font-size: 1.1rem;
+        }
+
+        .btn-glass:hover i {
+            color: var(--secondary);
+            opacity: 1;
+        }
+
+        /* Media Queries para Responsive Design */
+        @media (max-width: 768px) {
+            .glass-card {
+                padding: 2rem;
+            }
+
+            .intro-card {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .main-title {
+                font-size: 2.2rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            button,
+            .btn-link {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Fondos dinámicos -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="slider-container">
+
+        <!-- Diapositiva 1: Introducción -->
+        <div class="slide active" id="slide1" style="flex-direction: column; width: 100%;">
+            <div style="width: 100%; max-width: 1300px; padding: 0 20px; box-sizing: border-box;">
+                <h1 class="main-title">
+                    <span class="dark-text">Curso:</span> <span class="green-text">ABC Experiencia en Vía</span>
+                </h1>
+
+                <div class="intro-card">
+                    <p class="intro-text">
+                        <strong>Objetivo de la Metodología:</strong> Transformar el aprendizaje corporativo de un
+                        formato plano a una experiencia inmersiva, cálida y gamificada. Cada capítulo está estructurado
+                        para conectar el propósito organizacional con la empatía del colaborador mediante ejemplos
+                        reales, finalizando con herramientas web interactivas que fomentan la reflexión personal y la
+                        apropiación activa del conocimiento.
+                    </p>
+
+                    <p class="intro-text" style="margin-bottom: 0;">
+                        Este no es un curso tradicional; es un viaje de conexión humana. Aquí, tu labor deja de ser una
+                        tarea operativa para convertirse en una pieza fundamental del tejido de nuestra ciudad. Tu
+                        actitud, tu respeto y tu empatía son las herramientas más poderosas con las que contamos para
+                        transformar un trayecto en un momento memorable.
+                    </p>
+
+                    <div class="nav-buttons" style="justify-content: center; margin-top: 1.5rem;">
+                        <button class="btn-primary" onclick="nextSlide()">
+                            Continuar <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diapositiva 2: El Objetivo -->
+        <div class="slide" id="slide2" style="flex-direction: column; width: 100%;">
+            <div style="width: 100%; max-width: 1300px; padding: 0 20px; box-sizing: border-box; text-align: left;">
+                
+                <div class="card-icon" style="color: var(--secondary); background: #ffffff; border: 1px solid rgba(0,0,0,0.02); margin-bottom: 1rem; width: 50px; height: 50px; font-size: 1.4rem;">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                
+                <h2 class="slide-title">Nuestro Compromiso: Una Experiencia Inmersiva</h2>
+                
+                <p class="intro-text" style="text-align: left; margin-bottom: 1.5rem;">
+                    Nuestro objetivo es claro: trascender la operación y <strong style="color: var(--primary);">elevar el servicio a un nivel superior</strong>. A través de este programa, buscamos:
+                </p>
+
+                <div class="feature-cards">
+                    <!-- Feature Card 1 -->
+                    <div class="f-card">
+                        <div class="f-icon f-icon-1"><i class="fa-solid fa-link"></i></div>
+                        <div class="f-content">
+                            <h3>Conectar</h3>
+                            <p>Redescubrir el sentido profundo de nuestra labor y cómo impacta directamente en la vida de los ciudadanos.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature Card 2 -->
+                    <div class="f-card">
+                        <div class="f-icon f-icon-2"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                        <div class="f-content">
+                            <h3>Implicarnos</h3>
+                            <p>Vivir una experiencia inmersiva que nos invita a reflexionar, sentir y actuar desde nuestros valores: Honestidad, Respeto, Compromiso, Diligencia, Justicia y Empatía.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature Card 3 -->
+                    <div class="f-card">
+                        <div class="f-icon f-icon-3"><i class="fa-solid fa-star"></i></div>
+                        <div class="f-content">
+                            <h3>Hacerlo Memorable</h3>
+                            <p>Convertirnos en los arquitectos de una experiencia positiva para el usuario, asegurando que cada interacción sea un reflejo de nuestra excelencia.</p>
+                        </div>
+                    </div>
+
+                    <!-- Feature Card 4 -->
+                    <div class="f-card">
+                        <div class="f-icon f-icon-4"><i class="fa-solid fa-chart-line"></i></div>
+                        <div class="f-content">
+                            <h3>Evolucionar Juntos</h3>
+                            <p>Las dinámicas del curso recopilan datos reales sobre las decisiones de cada colaborador. Con ellos, identificamos fortalezas del equipo y áreas de oportunidad para diseñar futuras capacitaciones más precisas, personalizadas y orientadas al crecimiento colectivo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-text" style="margin-top: 2rem; text-align: center;">
+                    Estamos aquí para construir, juntos, la cara amable y eficiente de Bogotá.
+                </div>
+
+                <div class="nav-buttons" style="justify-content: center; margin-top: 1.5rem;">
+                    <button onclick="prevSlide()" class="btn-secondary">
+                        <i class="fa-solid fa-arrow-left"></i> Atrás
+                    </button>
+
+                    <a href="Presentación 2.html" class="btn-link btn-glass">
+                        <i class="fa-solid fa-book-open"></i> Contenido
+                    </a>
+                    <a href="Presentación Cronograma.html" class="btn-link btn-glass">
+                        <i class="fa-solid fa-calendar-check"></i> Cronograma
+                    </a>
+                    <a href="Dinámica.html" class="btn-link btn-glass">
+                        <i class="fa-solid fa-gamepad"></i> Dinámicas
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function nextSlide() {
+            const slide1 = document.getElementById('slide1');
+            const slide2 = document.getElementById('slide2');
+            slide1.classList.remove('active');
+            setTimeout(() => { slide2.classList.add('active'); }, 300);
+        }
+
+        function prevSlide() {
+            const slide1 = document.getElementById('slide1');
+            const slide2 = document.getElementById('slide2');
+            slide2.classList.remove('active');
+            setTimeout(() => { slide1.classList.add('active'); }, 300);
+        }
+
+        // Soporte de hash en URL: index.html#slide2 navega directo al slide 2
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.location.hash === '#slide2') {
+                const slide1 = document.getElementById('slide1');
+                const slide2 = document.getElementById('slide2');
+                slide1.classList.remove('active');
+                slide2.classList.add('active');
+                // Limpiar el hash de la URL sin recargar
+                history.replaceState(null, '', window.location.pathname);
+            }
+        });
+    </script>
+</body>
+
+</html>
